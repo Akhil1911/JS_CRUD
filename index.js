@@ -95,12 +95,15 @@ const handleStudentFormSubmit = (e) => {
   } else {
     console.log("Failed");
   }
+
+  // window.location.href = "index.html";
   // formSubmitted = false;
   // console.log(studentFullData, "handleStudentFormSubmit");
 };
 
 //creting new education fields
 const handleEducationDetails = () => {
+  // console.log("Called");
   //   showStudentData();
   let newEducationField = document.createElement("div");
   newEducationField.setAttribute("class", "row mt-4");
@@ -531,7 +534,12 @@ const clearFormValuesOnBTNClick = () => {
     input.hasAttribute("style") && input.removeAttribute("style");
   });
 
-  for (let i = educationFormTotalChildresns; i > 2; i--) {
+  // console.log(educationFormTotalChildresns, "error");
+  // console.log(educationForm.childElementCount, "error 2");
+  // console.log(educationForm.children.length, "success");
+  // for (let i = educationForm.children.length; i > 2; i--) {
+  for (let i = educationForm.children.length; i > 2; i--) {
+    // educationForm.removeChild(educationForm.lastElementChild);
     educationForm.lastElementChild.remove();
   }
 };
@@ -555,18 +563,37 @@ const editStudent = (id) => {
   document.getElementById("gradYearInput").value =
     selectedStudent.personalDetails.gradYear;
 
-  for (let i = 0; i < educationFormTotalChildresns; i++) {
-    educationForm.children[i].querySelector(".degree-class").value =
-      selectedStudent.educationDetails[i].degree;
-    educationForm.children[i].querySelector(".schclg-class").value =
-      selectedStudent.educationDetails[i].schClg;
-    educationForm.children[i].querySelector(".startdate-class").value =
-      selectedStudent.educationDetails[i].startDate;
-    educationForm.children[i].querySelector(".passout-class").value =
-      selectedStudent.educationDetails[i].passoutYear;
-    educationForm.children[i].querySelector(".percentage-class").value =
-      selectedStudent.educationDetails[i].percentage;
-    educationForm.children[i].querySelector(".backlog-class").value =
-      selectedStudent.educationDetails[i].backLog;
+  // console.log(selectedStudent.educationDetails.length);
+
+  for (let i = 0; i < selectedStudent.educationDetails.length; i++) {
+    // console.log(selectedStudent);
+    if (i <= 1) {
+      educationForm.children[i].querySelector(".degree-class").value =
+        selectedStudent.educationDetails[i].degree;
+      educationForm.children[i].querySelector(".schclg-class").value =
+        selectedStudent.educationDetails[i].schClg;
+      educationForm.children[i].querySelector(".startdate-class").value =
+        selectedStudent.educationDetails[i].startDate;
+      educationForm.children[i].querySelector(".passout-class").value =
+        selectedStudent.educationDetails[i].passoutYear;
+      educationForm.children[i].querySelector(".percentage-class").value =
+        selectedStudent.educationDetails[i].percentage;
+      educationForm.children[i].querySelector(".backlog-class").value =
+        selectedStudent.educationDetails[i].backLog;
+    } else {
+      handleEducationDetails();
+      educationForm.children[i].querySelector(".degree-class").value =
+        selectedStudent.educationDetails[i].degree;
+      educationForm.children[i].querySelector(".schclg-class").value =
+        selectedStudent.educationDetails[i].schClg;
+      educationForm.children[i].querySelector(".startdate-class").value =
+        selectedStudent.educationDetails[i].startDate;
+      educationForm.children[i].querySelector(".passout-class").value =
+        selectedStudent.educationDetails[i].passoutYear;
+      educationForm.children[i].querySelector(".percentage-class").value =
+        selectedStudent.educationDetails[i].percentage;
+      educationForm.children[i].querySelector(".backlog-class").value =
+        selectedStudent.educationDetails[i].backLog;
+    }
   }
 };
