@@ -5,9 +5,13 @@ let educationFormTotalChildresns = educationForm.childElementCount;
 let studentFullData = JSON.parse(localStorage.getItem("data")) || [];
 let submitBTN = document.getElementById("submit-form-btn");
 let formSubmitted = false;
+let isEditMode = false;
+let selectedStuID;
+const addEducationBtn = document.getElementById("addEducationBtn");
 //regex
 let charOnlyRegex = /^[a-zA-Z\s]+$/;
 let emailRegex = /^([a-zA-Z0-9]{6,})@[a-zA-Z]{3,}\.[a-z]{2,10}$/;
+
 // form submit
 const handleStudentFormSubmit = (e) => {
   e.preventDefault();
@@ -24,7 +28,7 @@ const handleStudentFormSubmit = (e) => {
   let isValid = checkValidations();
   if (isValid) {
     let personalDetails = {
-      id,
+      id: isEditMode ? selectedStuID : id,
       firstName: firstName.value,
       lastName: lastName.value,
       birthDate: birthDate.value,
@@ -58,10 +62,25 @@ const handleStudentFormSubmit = (e) => {
       });
     }
 
-    studentFullData.push({
-      personalDetails,
-      educationDetails,
-    });
+    if (isEditMode) {
+      studentFullData.splice(selectedStuID, 1, {
+        personalDetails,
+        educationDetails,
+      });
+      isEditMode = false;
+    } else {
+      studentFullData.push({
+        personalDetails,
+        educationDetails,
+      });
+    }
+
+    // studentFullData.push({
+    //   personalDetails,
+    //   educationDetails,
+    // });
+    // isEditMode = false;
+    console.log(selectedStuID, isEditMode);
 
     localStorage.setItem("data", JSON.stringify(studentFullData));
     studentDataForm.reset();
@@ -76,7 +95,7 @@ const handleStudentFormSubmit = (e) => {
   } else {
     console.log("Failed");
   }
-
+  // formSubmitted = false;
   // console.log(studentFullData, "handleStudentFormSubmit");
 };
 
@@ -202,13 +221,20 @@ const showStudentData = () => {
         }
       )}</td>
       
-      <td><i class="fa-solid fa-trash fa-xl text-dark mx-3"
+      <td>
+      <i
+      data-bs-toggle="modal"
+                data-bs-target="#studentdetailsmodal"
+      class="fa-solid fa-pen-to-square fa-xl text-dark" 
+      onclick="editStudent(${value.personalDetails.id})" 
+      style="cursor:pointer;"
+      ></i>
+      <i class="fa-solid fa-trash fa-xl text-dark "
       onclick="removeStudentFromTable(${value.personalDetails.id})" 
-      style="cursor:pointer;"></i></td>
+      style="cursor:pointer; margin-left:10px"></i></td>
         `;
       tableKaBody.appendChild(newTR);
     });
-    console.log(idCounter);
 
     // arr?.map((value) => console.log(value.personalDetails));
   } else {
@@ -223,9 +249,15 @@ showStudentData();
 
 //removeStudentFromTable
 const removeStudentFromTable = (id) => {
+  let idCounter = 0;
   let arr = JSON.parse(localStorage.getItem("data"));
   if (arr.length > 0) {
-    let tempArr = arr.filter((val) => val.personalDetails.id != id);
+    let tempArr = arr
+      .filter((val) => val.personalDetails.id != id)
+      .map((val) => {
+        val.personalDetails.id = idCounter++;
+        return val;
+      });
     if (window.confirm("Are you sure you want to delete data?")) {
       localStorage.removeItem("data");
       localStorage.setItem("data", JSON.stringify(tempArr));
@@ -496,11 +528,45 @@ const clearFormValuesOnBTNClick = () => {
   });
   let inputFields = document.querySelectorAll("input");
   inputFields.forEach((input) => {
-    console.log(input);
     input.hasAttribute("style") && input.removeAttribute("style");
   });
 
   for (let i = educationFormTotalChildresns; i > 2; i--) {
     educationForm.lastElementChild.remove();
+  }
+};
+
+const editStudent = (id) => {
+  isEditMode = true;
+  selectedStuID = id;
+  let selectedStudent = studentFullData.find(
+    (student) => student.personalDetails.id === id
+  );
+  document.getElementById("firstNameInput").value =
+    selectedStudent.personalDetails.firstName;
+  document.getElementById("lastNameInput").value =
+    selectedStudent.personalDetails.lastName;
+  document.getElementById("birthDateInput").value =
+    selectedStudent.personalDetails.birthDate;
+  document.getElementById("emailInput").value =
+    selectedStudent.personalDetails.email;
+  document.getElementById("addressInput").value =
+    selectedStudent.personalDetails.address;
+  document.getElementById("gradYearInput").value =
+    selectedStudent.personalDetails.gradYear;
+
+  for (let i = 0; i < educationFormTotalChildresns; i++) {
+    educationForm.children[i].querySelector(".degree-class").value =
+      selectedStudent.educationDetails[i].degree;
+    educationForm.children[i].querySelector(".schclg-class").value =
+      selectedStudent.educationDetails[i].schClg;
+    educationForm.children[i].querySelector(".startdate-class").value =
+      selectedStudent.educationDetails[i].startDate;
+    educationForm.children[i].querySelector(".passout-class").value =
+      selectedStudent.educationDetails[i].passoutYear;
+    educationForm.children[i].querySelector(".percentage-class").value =
+      selectedStudent.educationDetails[i].percentage;
+    educationForm.children[i].querySelector(".backlog-class").value =
+      selectedStudent.educationDetails[i].backLog;
   }
 };
